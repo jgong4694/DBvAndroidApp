@@ -2,11 +2,19 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" >
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <uses-feature android:name="android.hardware.camera"></uses-feature>
+    <uses-feature android:name="android.hardware.camera.autofocus"></uses-feature>
+
+
+
     <application
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_logo_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -22,6 +30,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".NoticeAddActivity"
+            android:theme="@style/Theme.Prototype.NoActionBar"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE"/>
+                <data android:mimeType="*/*" />
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.camera.experimental.useHAL3"
+                android:value="true" />
+        </activity>
         <activity android:name=".JeosujiActivity"
             android:theme="@style/Theme.Prototype.NoActionBar"/>
         <activity android:name=".MyPageActivity"
@@ -30,8 +53,17 @@
             android:theme="@style/Theme.Prototype.NoActionBar"/>
         <activity android:name=".GisActivity"
             android:theme="@style/Theme.Prototype.NoActionBar"/>
-        <activity android:name=".NoticeAddActivity"
+        <activity android:name=".LoginActivity"
             android:theme="@style/Theme.Prototype.NoActionBar"/>
     </application>
 
+    <meta-data
+        android:name="DATABASE_URL"
+        android:value="jdbc:mariadb://127.0.0.1:3306/unnamed"/>
+    <meta-data
+        android:name="USER_NAME"
+        android:value=""/>
+    <meta-data
+        android:name="PASSWORD"
+        android:value=""/>
 </manifest>

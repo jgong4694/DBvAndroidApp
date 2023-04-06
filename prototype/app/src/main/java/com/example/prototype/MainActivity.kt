@@ -1,35 +1,21 @@
 package com.example.prototype
-
-import android.app.LauncherActivity.ListItem
-import android.content.ClipData.Item
+import android.Manifest
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Camera
-import android.hardware.camera2.CameraManager
-import android.nfc.NfcAdapter
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Adapter
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.ListView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.view.menu.MenuView.ItemView
-import androidx.appcompat.widget.ViewStubCompat
-import androidx.core.view.get
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.fragment.findNavController
 import com.example.prototype.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.navigation.NavigationBarView
-import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var menu: Menu
     private lateinit var menuItem: MenuItem
     private lateinit var imageView: ImageView
+    private val PERMISSION_REQUEST_READ_EXTERNAL_STORAGE = 100
+    private val REQUEST_CODE_CHOOSE_IMAGE = 101
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -79,13 +67,41 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.cameraButton -> {
-                    intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE_SECURE)
-                    startActivity(intent)
+                    //intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE_SECURE)
+                    //startActivity(intent)
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this,
+                            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                            PERMISSION_REQUEST_READ_EXTERNAL_STORAGE)
+                    } else {
+                        chooseImage()
+                    }
                     overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left)
                     false
                 }
                 else -> false
             }
+        }
+    }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_REQUEST_READ_EXTERNAL_STORAGE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                chooseImage()
+            } else {
+                Toast.makeText(this, "갤러리에서 이미지를 선택하려면 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    private fun chooseImage() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        launcher.launch(intent)
+    }
+    private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK && result.data?.data != null) {
+            val uri = result.data?.data
+            // 선택한 이미지 처리
         }
     }
 }
